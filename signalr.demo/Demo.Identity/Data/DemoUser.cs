@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Demo.Identity.Data
 {
-    public class DemoUser : IdentityUser
+    public class DemoUser : IdentityUser<Guid>
     {
+        public string Avatar { get; set; }
     }
 }

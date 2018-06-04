@@ -1,4 +1,5 @@
-﻿using IdentityServer4;
+﻿using Demo.Identity.Data;
+using IdentityServer4;
 using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace Demo.Identity.Providers
                     //配置客户端授权模式
                     AllowedGrantTypes= GrantTypes.ResourceOwnerPassword,
                     //配置客户端连接密码
-                    ClientSecrets={ new IdentityServer4.Models.Secret("123123".Sha256())},
+                    ClientSecrets={ new Secret("123123".Sha256())},
                     //客户端允许的请求范围
                     AllowedScopes={
                         "chatapi",
@@ -45,8 +46,15 @@ namespace Demo.Identity.Providers
             return new List<ApiResource>
             {
                 //定义api资源
-                // 注意坑 只能用构造函数
-                new ApiResource("chatapi","chat api")
+                new ApiResource
+                {
+                    Name="chatapi",
+                    DisplayName="chat api",
+                    ApiSecrets= { new Secret("123123".Sha256()) },
+                    Scopes={
+                        new Scope("chatapi","chat api")
+                    }
+                }
             };
         }
 
@@ -57,6 +65,30 @@ namespace Demo.Identity.Providers
                     new IdentityResources.OpenId(),
                     new IdentityResources.Profile()
                 };
+        }
+
+        public static List<DemoUser> Users()
+        {
+            return new List<DemoUser>{
+                new DemoUser
+                {
+                    UserName = "laowang",
+                    Email = "520@qq.com",
+                    Id = Guid.NewGuid(),
+                    EmailConfirmed = true,
+                    TwoFactorEnabled = false,
+                    Avatar = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528131041794&di=78ae71a3573dc86bc010e301005fea53&imgtype=0&src=http%3A%2F%2Fpic2.orsoon.com%2F2017%2F0309%2F20170309032925886.png"
+                },
+                                new DemoUser
+                {
+                    UserName = "zhangsan",
+                    Email = "521@qq.com",
+                    Id = Guid.NewGuid(),
+                    EmailConfirmed = true,
+                    TwoFactorEnabled = false,
+                    Avatar = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528131041794&di=78ae71a3573dc86bc010e301005fea53&imgtype=0&src=http%3A%2F%2Fpic2.orsoon.com%2F2017%2F0309%2F20170309032925886.png"
+                }
+            };
         }
     }
 }

@@ -97,12 +97,12 @@ namespace Demo.Identity
             {
                 app.UseDeveloperExceptionPage();
             }
-            Migration(app);
+            Migration(app).Wait();
             app.UseCors("all");
             app.UseIdentityServer();
         }
 
-        private void Migration(IApplicationBuilder app)
+        private async Task Migration(IApplicationBuilder app)
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {
@@ -112,16 +112,12 @@ namespace Demo.Identity
                 configurationDbContext.Database.Migrate();
 
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<DemoUser>>();
-                if (userManager.FindByNameAsync("gucao").Result == null)
+                foreach (var user in SeedData.Users())
                 {
-                    var result = userManager.CreateAsync(new DemoUser
+                    if (userManager.FindByNameAsync(user.UserName).Result == null)
                     {
-                        UserName = "gucao",
-                        Email = "280780363@qq.com",
-                        Id = Guid.NewGuid().ToString(),
-                        EmailConfirmed = true,
-                        TwoFactorEnabled = false
-                    }, "123123").Result;
+                        await userManager.CreateAsync(user, "123123");
+                    }
                 }
 
                 if (!configurationDbContext.ApiResources.Any())
@@ -130,7 +126,7 @@ namespace Demo.Identity
                     configurationDbContext.IdentityResources.AddRange(SeedData.IdentityResources().Select(r => r.ToEntity()));
                 if (!configurationDbContext.Clients.Any())
                     configurationDbContext.Clients.AddRange(SeedData.Clients().Select(r => r.ToEntity()));
-                configurationDbContext.SaveChanges();
+                await configurationDbContext.SaveChangesAsync();
             }
         }
     }
