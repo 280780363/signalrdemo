@@ -39,7 +39,7 @@ namespace Demo.Identity
                 });
             });
 
-            services.AddIdentity<DemoUser, IdentityRole>(options =>
+            services.AddIdentity<DemoUser, DemoRole>(options =>
             {
                 options.Password.RequireDigit = false;
                 options.Password.RequiredLength = 6;
@@ -74,7 +74,7 @@ namespace Demo.Identity
                         });
                     };
                 })
-                .Services.AddTransient<IProfileService, MyProfileService>();
+                .Services.AddTransient<IProfileService, ProfileService>();
 
             services.AddCors(r =>
             {

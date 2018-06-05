@@ -9,41 +9,56 @@ namespace Demo.Chat
 {
     public class MessageHub : Hub
     {
-        static ConcurrentDictionary<string, string> userDic;
-        static MessageHub()
+        MsgSender msgSender;
+        MsgHandler msgQueueHandler;
+        OnlineUsers onlineUsers;
+        public MessageHub(MsgSender msgSender, MsgHandler msgQueueHandler, OnlineUsers onlineUsers)
         {
-            userDic = new ConcurrentDictionary<string, string>();
+            this.msgSender = msgSender;
+            this.msgQueueHandler = msgQueueHandler;
+            this.onlineUsers = onlineUsers;
         }
 
-        public MessageHub()
-        {
-            var c = Clients;
-            var context = Context;
-        }
-
-        public Task Send(string user, string message)
+        public async Task Send(string toUserId, string message)
         {
             string timestamp = DateTime.Now.ToShortTimeString();
+            var toUser = onlineUsers.GetUserById(new Guid(toUserId));
+            if (toUser == null)
+                return;
+            var fromUser = Context.User.GetUser();
 
-            if (!userDic.ContainsKey(user))
-                return Task.CompletedTask;
+            msgSender.Send(new Dtos.MsgDto
+            {
+                Content = message,
+                FromUser = fromUser,
+                SendTime = DateTime.Now,
+                ToUser = toUser
+            });
 
-            var id = userDic[user];
-            return MessageHandle.Enqueue(id, Context.User.Identity.Name, message);
+            await Task.CompletedTask;
         }
 
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
-            string name = Context.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(name))
-                return Task.CompletedTask;
+            await base.OnConnectedAsync();
+            var user = Context.User.GetUser();
+            user.ConnectionId = Context.ConnectionId;
+            onlineUsers.AddOrUpdateUser(user);
+            await RefreshUsersAsync();
+        }
 
-            if (userDic.ContainsKey(name))
-                userDic[name] = Context.ConnectionId;
-            else
-                userDic.TryAdd(name, Context.ConnectionId);
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            //disconnection
+            await base.OnDisconnectedAsync(exception);
+            await RefreshUsersAsync();
+        }
 
-            return base.OnConnectedAsync();
+
+        private async Task RefreshUsersAsync()
+        {
+            var users = onlineUsers.GetAllUser();
+            await Clients.All.SendAsync("Refresh", users);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Demo.Identity.Migrations.PersistedGrantMigrations
+namespace Demo.Identity.Migrations.PersistedGrantDbMigrations
 {
     public partial class init : Migration
     {

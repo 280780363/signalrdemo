@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Demo.Identity.Migrations.ConfigurationMigrations
+namespace Demo.Identity.Migrations.ConfigurationDbMigrations
 {
     [DbContext(typeof(ConfigurationDbContext))]
-    [Migration("20180603122345_init")]
+    [Migration("20180605134705_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

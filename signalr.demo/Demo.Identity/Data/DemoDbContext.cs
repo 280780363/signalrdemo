@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Demo.Identity.Data
 {
-    public class DemoDbContext : IdentityDbContext<DemoUser>
+    public class DemoDbContext : IdentityDbContext<DemoUser, DemoRole, Guid>
     {
         public DemoDbContext(DbContextOptions<DemoDbContext> options) : base(options)
         {

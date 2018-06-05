@@ -21,6 +21,10 @@ namespace Demo.Chat
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<MsgHandler>()
+                .AddSingleton<MsgSender>()
+                .AddSingleton<OnlineUsers>();
+
             //增加认证服务
             services.AddAuthentication(r =>
             {
@@ -37,23 +41,50 @@ namespace Demo.Chat
                 r.ApiName = "chatapi";
                 //配置 当前资源服务器的连接密码
                 r.ApiSecret = "123123";
+                r.SaveToken = true;
             });
-
+            services.AddCors(r =>
+            {
+                r.AddPolicy("all", policy =>
+                {
+                    policy
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials()
+                    ;
+                });
+            });
+            services.AddAuthorization();
             //增加SignalR 服务
             services.AddSignalR();
             services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(
+            IApplicationBuilder app,
+            IHostingEnvironment env,
+            MsgHandler msgHandler,
+            IApplicationLifetime applicationLifetime)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCors("all");
             app.UseAuthentication();
+            //使用SignalR 并添加MessageHub类的消息处理器
+            app.UseSignalR(r =>
+            {
+                r.MapHub<MessageHub>("/msg");
+            });
             app.UseMvc();
+
+            //应用启动时开始处理消息
+            applicationLifetime.ApplicationStarted.Register(msgHandler.BeginHandleMsg);
+            //应用退出时,释放资源
+            applicationLifetime.ApplicationStopping.Register(msgHandler.Dispose);
         }
     }
 }

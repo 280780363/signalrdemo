@@ -7,11 +7,9 @@ namespace Demo.Chat.Dtos
 {
     public class MsgDto
     {
-        public Guid Id { get; set; }
+        public UserDto FromUser { get; set; }
 
-        public Guid FromUserId { get; set; }
-
-        public Guid ToUserId { get; set; }
+        public UserDto ToUser { get; set; }
 
         public string Content { get; set; }
 

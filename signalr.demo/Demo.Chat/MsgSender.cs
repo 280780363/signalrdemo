@@ -12,18 +12,17 @@ using System.Threading.Tasks;
 
 namespace Demo.Chat
 {
-    public class RabbitMQHandler
+    public class MsgSender
     {
-        public RabbitMQHandler(IConfiguration configuration, IHubContext<MessageHub> hubContext)
+        public MsgSender(IConfiguration configuration)
         {
             factory = new ConnectionFactory();
             factory.HostName = configuration.GetValue<string>("RabbitMQ:Host");
             factory.UserName = configuration.GetValue<string>("RabbitMQ:User");
             factory.Password = configuration.GetValue<string>("RabbitMQ:Password");
-            this.hubContext = hubContext;
         }
         ConnectionFactory factory;
-        IHubContext<MessageHub> hubContext;
+
         public void Send(MsgDto msg)
         {
             using (var connection = factory.CreateConnection())
@@ -35,25 +34,6 @@ namespace Demo.Chat
                     channel.BasicPublish("", "chat_queue", null, body); //开始传递
                 }
             }
-        }
-        IConnection connection;
-        IModel channel;
-        public void BeginHandleMsg()
-        {
-            connection = factory.CreateConnection();
-            var channel = connection.CreateModel();
-            channel.QueueDeclare("chat_queue", false, false, false, null);
-
-            var consumer = new EventingBasicConsumer(channel);
-            channel.BasicConsume("chat_queue", false, consumer);
-            consumer.Received += (model, ea) =>
-            {
-                var body = ea.Body;
-                var message = Encoding.UTF8.GetString(body);
-                var msg = JsonConvert.DeserializeObject<MsgDto>(message);
-
-                channel.BasicAck(ea.DeliveryTag, false);
-            };
         }
     }
 }
