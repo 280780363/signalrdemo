@@ -30,5 +30,11 @@ namespace Demo.Chat
             onlineUsers.TryGetValue(userId, out UserDto user);
             return user;
         }
+
+        public void OfflineUser(Guid userId)
+        {
+            if (onlineUsers.ContainsKey(userId))
+                onlineUsers.TryRemove(userId, out UserDto user);
+        }
     }
 }

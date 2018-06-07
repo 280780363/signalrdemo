@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Demo.Chat.Dtos;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Demo.Chat
 {
+    [Authorize]
     public class MessageHub : Hub
     {
         MsgSender msgSender;
@@ -24,9 +27,8 @@ namespace Demo.Chat
             string timestamp = DateTime.Now.ToShortTimeString();
             var toUser = onlineUsers.GetUserById(new Guid(toUserId));
             if (toUser == null)
-                return;
+                await SendErrorAsync("用户已离线");
             var fromUser = Context.User.GetUser();
-
             msgSender.Send(new Dtos.MsgDto
             {
                 Content = message,
@@ -42,8 +44,11 @@ namespace Demo.Chat
         {
             await base.OnConnectedAsync();
             var user = Context.User.GetUser();
-            user.ConnectionId = Context.ConnectionId;
-            onlineUsers.AddOrUpdateUser(user);
+            if (user != null)
+            {
+                user.ConnectionId = Context.ConnectionId;
+                onlineUsers.AddOrUpdateUser(user);
+            }
             await RefreshUsersAsync();
         }
 
@@ -51,14 +56,21 @@ namespace Demo.Chat
         {
             //disconnection
             await base.OnDisconnectedAsync(exception);
+            var userId = Context.User?.GetUser()?.Id;
+            if (userId.HasValue)
+                onlineUsers.OfflineUser(userId.Value);
             await RefreshUsersAsync();
         }
-
 
         private async Task RefreshUsersAsync()
         {
             var users = onlineUsers.GetAllUser();
             await Clients.All.SendAsync("Refresh", users);
+        }
+
+        private async Task SendErrorAsync(string errorMsg)
+        {
+            await Clients.Caller.SendAsync("Error", errorMsg);
         }
     }
 }

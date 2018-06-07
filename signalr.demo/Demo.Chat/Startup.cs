@@ -72,7 +72,19 @@ namespace Demo.Chat
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseStaticFiles();
             app.UseCors("all");
+
+            // signalr jwt认证 token添加
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Query.TryGetValue("token", out var token))
+                {
+                    context.Request.Headers.Add("Authorization", $"Bearer {token}");
+                }
+                await next.Invoke();
+            });
+
             app.UseAuthentication();
             //使用SignalR 并添加MessageHub类的消息处理器
             app.UseSignalR(r =>

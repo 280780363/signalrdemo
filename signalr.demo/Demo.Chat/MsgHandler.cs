@@ -41,7 +41,7 @@ namespace Demo.Chat
                 var msg = JsonConvert.DeserializeObject<MsgDto>(message);
 
                 hubContext.Clients?.Client(msg.ToUser.ConnectionId)
-                                  ?.SendAsync("Receive", new object[] { DateTime.Now, msg });
+                                  ?.SendAsync("Receive", DateTime.Now, msg);
 
                 channel.BasicAck(arg.DeliveryTag, false);
             };
