@@ -25,7 +25,7 @@ namespace Demo.Chat
         public async Task Send(string toUserId, string message)
         {
             string timestamp = DateTime.Now.ToShortTimeString();
-            var toUser = onlineUsers.GetUserById(new Guid(toUserId));
+            var toUser = onlineUsers.Get(new Guid(toUserId));
             if (toUser == null)
                 await SendErrorAsync("用户已离线");
             var fromUser = Context.User.GetUser();
@@ -58,13 +58,13 @@ namespace Demo.Chat
             await base.OnDisconnectedAsync(exception);
             var userId = Context.User?.GetUser()?.Id;
             if (userId.HasValue)
-                onlineUsers.OfflineUser(userId.Value);
+                onlineUsers.Remove(userId.Value);
             await RefreshUsersAsync();
         }
 
         private async Task RefreshUsersAsync()
         {
-            var users = onlineUsers.GetAllUser();
+            var users = onlineUsers.Get();
             await Clients.All.SendAsync("Refresh", users);
         }
 

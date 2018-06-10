@@ -9,6 +9,9 @@ namespace Demo.Chat
 {
     public class OnlineUsers
     {
+        /// <summary>
+        /// 用户id作为key
+        /// </summary>
         private static ConcurrentDictionary<Guid, UserDto> onlineUsers { get; } = new ConcurrentDictionary<Guid, UserDto>();
 
         public void AddOrUpdateUser(UserDto user)
@@ -20,18 +23,18 @@ namespace Demo.Chat
         }
 
 
-        public List<UserDto> GetAllUser()
+        public List<UserDto> Get()
         {
             return onlineUsers.Values.ToList();
         }
 
-        public UserDto GetUserById(Guid userId)
+        public UserDto Get(Guid userId)
         {
             onlineUsers.TryGetValue(userId, out UserDto user);
             return user;
         }
 
-        public void OfflineUser(Guid userId)
+        public void Remove(Guid userId)
         {
             if (onlineUsers.ContainsKey(userId))
                 onlineUsers.TryRemove(userId, out UserDto user);

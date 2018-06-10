@@ -21,28 +21,31 @@ namespace Demo.Chat
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            // 注册消息处理器 消息发送器，在线用户类
             services.AddSingleton<MsgHandler>()
                 .AddSingleton<MsgSender>()
                 .AddSingleton<OnlineUsers>();
 
-            //增加认证服务
+            // 增加认证服务
             services.AddAuthentication(r =>
             {
                 r.DefaultScheme = "JwtBearer";
             }).AddCookie()
-            //增加jwt认证
+            // 增加jwt认证
             .AddIdentityServerAuthentication("JwtBearer", r =>
             {
-                //配置认证服务器
+                // 配置认证服务器
                 r.Authority = Configuration.GetValue<string>("Authentication:Authority");
-                //配置无需验证https
+                // 配置无需验证https
                 r.RequireHttpsMetadata = false;
-                //配置 当前资源服务器的名称
+                // 配置 当前资源服务器的名称
                 r.ApiName = "chatapi";
-                //配置 当前资源服务器的连接密码
+                // 配置 当前资源服务器的连接密码
                 r.ApiSecret = "123123";
                 r.SaveToken = true;
             });
+
+            // 跨域
             services.AddCors(r =>
             {
                 r.AddPolicy("all", policy =>
@@ -55,8 +58,9 @@ namespace Demo.Chat
                     ;
                 });
             });
+            // 增加授权服务
             services.AddAuthorization();
-            //增加SignalR 服务
+            // 增加SignalR 服务
             services.AddSignalR();
             services.AddMvc();
         }
@@ -86,16 +90,16 @@ namespace Demo.Chat
             });
 
             app.UseAuthentication();
-            //使用SignalR 并添加MessageHub类的消息处理器
+            // 使用SignalR 并添加MessageHub类的消息处理器
             app.UseSignalR(r =>
             {
                 r.MapHub<MessageHub>("/msg");
             });
             app.UseMvc();
 
-            //应用启动时开始处理消息
+            // 应用启动时开始处理消息
             applicationLifetime.ApplicationStarted.Register(msgHandler.BeginHandleMsg);
-            //应用退出时,释放资源
+            // 应用退出时,释放资源
             applicationLifetime.ApplicationStopping.Register(msgHandler.Dispose);
         }
     }
