@@ -26,6 +26,7 @@ namespace Demo.Chat
 
         }
         ConnectionFactory factory;
+        // 注入SignalR的消息处理器上下文，用以发送消息到客户端
         IHubContext<MessageHub> hubContext;
         IConnection connection;
         IModel channel;
@@ -39,9 +40,9 @@ namespace Demo.Chat
                 var body = arg.Body;
                 var message = Encoding.UTF8.GetString(body);
                 var msg = JsonConvert.DeserializeObject<MsgDto>(message);
-
+                // 通过消息处理器上下文发送消息到客户端
                 hubContext.Clients?.Client(msg.ToUser.ConnectionId)
-                                  ?.SendAsync("Receive", DateTime.Now, msg);
+                                  ?.SendAsync("Receive", msg);
 
                 channel.BasicAck(arg.DeliveryTag, false);
             };

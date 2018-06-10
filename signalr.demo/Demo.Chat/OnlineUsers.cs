@@ -16,12 +16,8 @@ namespace Demo.Chat
 
         public void AddOrUpdateUser(UserDto user)
         {
-            if (onlineUsers.ContainsKey(user.Id))
-                return;
-
             onlineUsers.AddOrUpdate(user.Id, user, (id, r) => user);
         }
-
 
         public List<UserDto> Get()
         {

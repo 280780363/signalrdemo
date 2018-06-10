@@ -42,7 +42,7 @@ namespace Demo.Identity.Data
                         IdentityServerConstants.StandardScopes.Profile },
                     //允许离线,即开启refresh_token
                     AllowOfflineAccess =true,
-                    RequireClientSecret=false
+                    RequireClientSecret=false,
                 }
             };
         }

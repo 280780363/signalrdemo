@@ -7,6 +7,7 @@ namespace Demo.Chat.Dtos
 {
     public class UserDto
     {
+        // signalr当前的连接id
         public string ConnectionId { get; set; }
         public Guid Id { get; set; }
         public string UserName { get; set; }

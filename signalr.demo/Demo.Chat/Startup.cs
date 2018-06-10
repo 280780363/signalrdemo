@@ -30,7 +30,7 @@ namespace Demo.Chat
             services.AddAuthentication(r =>
             {
                 r.DefaultScheme = "JwtBearer";
-            }).AddCookie()
+            })
             // 增加jwt认证
             .AddIdentityServerAuthentication("JwtBearer", r =>
             {
@@ -42,7 +42,7 @@ namespace Demo.Chat
                 r.ApiName = "chatapi";
                 // 配置 当前资源服务器的连接密码
                 r.ApiSecret = "123123";
-                r.SaveToken = true;
+                r.SaveToken = true;              
             });
 
             // 跨域
@@ -82,8 +82,10 @@ namespace Demo.Chat
             // signalr jwt认证 token添加
             app.Use(async (context, next) =>
             {
+                // 这里从url中获取token参数，实际应用请实际考虑，加一些过滤条件
                 if (context.Request.Query.TryGetValue("token", out var token))
                 {
+                    // 从url中拿到header，再添加到header中，一定要在UseAuthentication之前
                     context.Request.Headers.Add("Authorization", $"Bearer {token}");
                 }
                 await next.Invoke();
