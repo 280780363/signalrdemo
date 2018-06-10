@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Demo.Identity.Providers
+namespace Demo.Identity.Data
 {
     public class SeedData
     {
