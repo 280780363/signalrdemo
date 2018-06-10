@@ -143,7 +143,7 @@ namespace Demo.Identity
 
                 // 增加ApiResources IdentityResources Clients
                 if (!configurationDbContext.ApiResources.Any())
-                    configurationDbContext.ApiResources.AddRange(ApiResources().Select(r => r.ToEntity()));
+                    configurationDbContext.ApiResources.AddRange(SeedData.ApiResources().Select(r => r.ToEntity()));
                 if (!configurationDbContext.IdentityResources.Any())
                     configurationDbContext.IdentityResources.AddRange(SeedData.IdentityResources().Select(r => r.ToEntity()));
                 if (!configurationDbContext.Clients.Any())
