@@ -62,7 +62,6 @@ namespace Demo.Chat
             services.AddAuthorization();
             // 增加SignalR 服务
             services.AddSignalR();
-            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -97,7 +96,6 @@ namespace Demo.Chat
             {
                 r.MapHub<MessageHub>("/msg");
             });
-            app.UseMvc();
 
             // 应用启动时开始处理消息
             applicationLifetime.ApplicationStarted.Register(msgHandler.BeginHandleMsg);
