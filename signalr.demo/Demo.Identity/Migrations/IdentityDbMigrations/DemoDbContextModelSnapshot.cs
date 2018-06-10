@@ -3,17 +3,15 @@ using System;
 using Demo.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Demo.Identity.Migrations.IdentityMigrations
+namespace Demo.Identity.Migrations.IdentityDbMigrations
 {
     [DbContext(typeof(DemoDbContext))]
-    [Migration("20180605135710_init")]
-    partial class init
+    partial class DemoDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,8 +23,6 @@ namespace Demo.Identity.Migrations.IdentityMigrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Avatar");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();

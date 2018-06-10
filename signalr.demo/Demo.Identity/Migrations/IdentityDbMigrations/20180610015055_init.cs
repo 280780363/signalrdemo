@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Demo.Identity.Migrations.IdentityMigrations
+namespace Demo.Identity.Migrations.IdentityDbMigrations
 {
     public partial class init : Migration
     {
@@ -15,8 +15,7 @@ namespace Demo.Identity.Migrations.IdentityMigrations
                     Id = table.Column<Guid>(nullable: false),
                     Name = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(nullable: true),
-                    Avatar = table.Column<string>(nullable: true)
+                    ConcurrencyStamp = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

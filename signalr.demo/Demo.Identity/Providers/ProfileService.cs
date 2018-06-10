@@ -12,6 +12,7 @@ namespace Demo.Identity.Providers
     public class ProfileService : IProfileService
     {
         UserManager<DemoUser> userManager;
+        // 注入AspNetCore Identity的用户管理类
         public ProfileService(UserManager<DemoUser> userManager)
         {
             this.userManager = userManager;
@@ -19,12 +20,14 @@ namespace Demo.Identity.Providers
         public async Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
             var claims = context.Subject.Claims.ToList();
+            // sub属性就是用户id
             var userId = claims.First(r => r.Type == "sub");
+            // 查找用户
             var user = await userManager.FindByIdAsync(userId.Value);
             claims.Add(new System.Security.Claims.Claim("username", user.UserName));
             claims.Add(new System.Security.Claims.Claim("email", user.Email));
             claims.Add(new System.Security.Claims.Claim("avatar", user.Avatar));
-            //这里是设置token包含的用户属性claim
+            // 这里是设置token包含的用户属性claim
             context.IssuedClaims = claims;
         }
 

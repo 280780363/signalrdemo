@@ -1,6 +1,12 @@
 ﻿using Demo.Identity.Data;
 using IdentityServer4;
+using IdentityServer4.EntityFramework.DbContexts;
+using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Models;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,19 +22,19 @@ namespace Demo.Identity.Data
             return new List<Client>
             {
                 new Client{
-                    //客户端id
+                    // 客户端id
                     ClientId ="chat_client",
-                    //客户端名称
+                    // 客户端名称
                     ClientName ="chat client",
-                    //TOKEN有效时长
+                    // TOKEN有效时长
                     AccessTokenLifetime = 3600,
-                    //配置TOKEN类型,reference为引用类型,数据不会存在TOKEN中
+                    // 配置TOKEN类型,reference为引用类型,数据不会存在TOKEN中
                     AccessTokenType= AccessTokenType.Jwt,
-                    //配置客户端授权模式
+                    // 配置客户端授权模式
                     AllowedGrantTypes= GrantTypes.ResourceOwnerPassword,
-                    //配置客户端连接密码
+                    // 配置客户端连接密码
                     ClientSecrets={ new Secret("123123".Sha256())},
-                    //客户端允许的请求范围
+                    // 客户端允许的请求范围
                     AllowedScopes={
                         "chatapi",
                         IdentityServerConstants.StandardScopes.OfflineAccess,
@@ -45,7 +51,8 @@ namespace Demo.Identity.Data
         {
             return new List<ApiResource>
             {
-                //定义api资源
+                // 定义api资源 这里如果使用构造函数传入Name会默认创建一个同名的Scope，
+                // 这点需要注意，因为这个Api如果没有Scope，那根本无法访问
                 new ApiResource
                 {
                     Name="chatapi",
